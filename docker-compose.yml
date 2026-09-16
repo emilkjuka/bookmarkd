@@ -1,0 +1,18 @@
+services:
+  bookmarkd:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '${BOOKMARKD_PORT:-3000}:3000'
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: /data/bookmarkd.db
+      HOST: 0.0.0.0
+      PORT: 3000
+    volumes:
+      - bookmarkd_data:/data
+
+volumes:
+  bookmarkd_data:

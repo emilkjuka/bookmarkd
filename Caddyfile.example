@@ -1,0 +1,7 @@
+# Example reverse proxy for production.
+# Place on the LXC host or a separate proxy container and point DNS here.
+
+bookmarks.example.com {
+	encode gzip
+	reverse_proxy 127.0.0.1:3000
+}
