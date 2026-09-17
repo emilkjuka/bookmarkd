@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import Icon from '#lib/components/Icon.svelte';
 
 	let { query = '' }: { query?: string } = $props();
 	let value = $derived(query);
@@ -34,15 +35,10 @@
 
 <label class="relative block">
 	<span class="sr-only">Search bookmarks</span>
-	<svg
-		class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3-3" /></svg
-	>
+	<Icon
+		name="lucide--search"
+		class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+	/>
 	<input
 		type="search"
 		placeholder="Search title, URL, notes…"

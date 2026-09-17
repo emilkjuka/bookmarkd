@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
+import { safeParse } from 'valibot';
 import {
 	bookmarkCreateSchema,
 	bookmarkDeleteSchema,
@@ -14,7 +15,8 @@ import {
 	updateBookmark
 } from '#lib/server/bookmarks/service';
 import { fetchPageMetadata } from '#lib/server/bookmarks/metadata';
-import { firstZodError, formString, formStrings, parseTagNames } from '#lib/server/form';
+import { setFlash } from '#lib/server/flash';
+import { firstValidationError, formString, formStrings, parseTagNames } from '#lib/server/form';
 
 function requireUserId(event: RequestEvent): string {
 	const userId = event.locals.user?.id;
@@ -36,15 +38,15 @@ function writePayload(data: FormData) {
 }
 
 export async function previewBookmarkAction(event: RequestEvent) {
-	const parsed = bookmarkPreviewSchema.safeParse({
+	const parsed = safeParse(bookmarkPreviewSchema, {
 		url: formString(await event.request.formData(), 'url')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'preview' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'preview' as const });
 	}
 
 	try {
-		const preview = await fetchPageMetadata(parsed.data.url);
+		const preview = await fetchPageMetadata(parsed.output.url);
 		return { preview, intent: 'preview' as const };
 	} catch (error) {
 		return fail(400, {
@@ -56,21 +58,21 @@ export async function previewBookmarkAction(event: RequestEvent) {
 
 export async function createBookmarkAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = bookmarkCreateSchema.safeParse(writePayload(await event.request.formData()));
+	const parsed = safeParse(bookmarkCreateSchema, writePayload(await event.request.formData()));
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'create' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'create' as const });
 	}
 
 	try {
 		await createBookmark(userId, {
-			url: parsed.data.url,
-			title: parsed.data.title,
-			description: parsed.data.description,
-			notes: parsed.data.notes,
-			categoryId: parsed.data.categoryId || null,
-			newCategory: parsed.data.newCategory,
-			tagIds: parsed.data.tagIds,
-			newTags: parseTagNames(parsed.data.newTags ?? '')
+			url: parsed.output.url,
+			title: parsed.output.title,
+			description: parsed.output.description,
+			notes: parsed.output.notes,
+			categoryId: parsed.output.categoryId || null,
+			newCategory: parsed.output.newCategory,
+			tagIds: parsed.output.tagIds,
+			newTags: parseTagNames(parsed.output.newTags ?? '')
 		});
 		return { saved: true, intent: 'create' as const };
 	} catch (error) {
@@ -84,24 +86,24 @@ export async function createBookmarkAction(event: RequestEvent) {
 export async function updateBookmarkAction(event: RequestEvent) {
 	const userId = requireUserId(event);
 	const data = await event.request.formData();
-	const parsed = bookmarkUpdateSchema.safeParse({
+	const parsed = safeParse(bookmarkUpdateSchema, {
 		...writePayload(data),
 		id: formString(data, 'id')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'update' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'update' as const });
 	}
 
 	try {
-		await updateBookmark(userId, parsed.data.id, {
-			url: parsed.data.url,
-			title: parsed.data.title,
-			description: parsed.data.description,
-			notes: parsed.data.notes,
-			categoryId: parsed.data.categoryId || null,
-			newCategory: parsed.data.newCategory,
-			tagIds: parsed.data.tagIds,
-			newTags: parseTagNames(parsed.data.newTags ?? '')
+		await updateBookmark(userId, parsed.output.id, {
+			url: parsed.output.url,
+			title: parsed.output.title,
+			description: parsed.output.description,
+			notes: parsed.output.notes,
+			categoryId: parsed.output.categoryId || null,
+			newCategory: parsed.output.newCategory,
+			tagIds: parsed.output.tagIds,
+			newTags: parseTagNames(parsed.output.newTags ?? '')
 		});
 		return { saved: true, intent: 'update' as const };
 	} catch (error) {
@@ -114,19 +116,22 @@ export async function updateBookmarkAction(event: RequestEvent) {
 
 export async function deleteBookmarkAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = bookmarkDeleteSchema.safeParse({
+	const parsed = safeParse(bookmarkDeleteSchema, {
 		id: formString(await event.request.formData(), 'id')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'delete' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'delete' as const });
 	}
 
 	try {
-		await deleteBookmark(userId, parsed.data.id);
+		await deleteBookmark(userId, parsed.output.id);
+		setFlash(event.cookies, { type: 'success', message: 'Bookmark deleted.' });
 		return { deleted: true, intent: 'delete' as const };
 	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Could not delete bookmark';
+		setFlash(event.cookies, { type: 'error', message });
 		return fail(400, {
-			message: error instanceof Error ? error.message : 'Could not delete bookmark',
+			message,
 			intent: 'delete' as const
 		});
 	}
@@ -134,15 +139,15 @@ export async function deleteBookmarkAction(event: RequestEvent) {
 
 export async function togglePinBookmarkAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = bookmarkTogglePinSchema.safeParse({
+	const parsed = safeParse(bookmarkTogglePinSchema, {
 		id: formString(await event.request.formData(), 'id')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'togglePin' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'togglePin' as const });
 	}
 
 	try {
-		await toggleBookmarkPin(userId, parsed.data.id);
+		await toggleBookmarkPin(userId, parsed.output.id);
 		return { toggled: true, intent: 'togglePin' as const };
 	} catch (error) {
 		return fail(400, {

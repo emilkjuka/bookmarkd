@@ -18,7 +18,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-See [docs/DEPLOY.md](./docs/DEPLOY.md) for Proxmox LXC setup, HTTPS, and backups.
+See [docs/DEPLOY.md](./docs/DEPLOY.md) for Proxmox LXC setup, NetBird access, and backups.
 
 ## Scripts
 

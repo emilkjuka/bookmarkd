@@ -1,11 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { auth } from '#lib/server/auth';
+import { safeRedirectPath } from '#lib/server/auth/redirect';
 import { APIError } from 'better-auth/api';
 
-export const load: PageServerLoad = ({ locals }) => {
-	if (locals.user) redirect(303, '/bookmarks');
-	return {};
+export const load: PageServerLoad = ({ locals, url }) => {
+	const redirectTo = safeRedirectPath(url.searchParams.get('redirectTo'));
+	if (locals.user) redirect(303, redirectTo);
+	return { redirectTo };
 };
 
 export const actions: Actions = {
@@ -13,6 +15,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const email = formData.get('email')?.toString() ?? '';
 		const password = formData.get('password')?.toString() ?? '';
+		const redirectTo = safeRedirectPath(formData.get('redirectTo')?.toString());
 
 		if (!email || !password) {
 			return fail(400, { message: 'Email and password are required' });
@@ -29,6 +32,6 @@ export const actions: Actions = {
 			return fail(500, { message: 'Unexpected error' });
 		}
 
-		redirect(303, '/bookmarks');
+		redirect(303, redirectTo);
 	}
 };

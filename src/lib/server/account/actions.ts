@@ -1,13 +1,14 @@
 import { fail } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
+import { safeParse } from 'valibot';
 import {
 	changeEmailSchema,
 	changePasswordSchema,
 	updateProfileSchema
 } from '#lib/schemas/account';
 import { auth } from '#lib/server/auth';
-import { firstZodError, formString } from '#lib/server/form';
+import { firstValidationError, formString } from '#lib/server/form';
 
 function authError(error: unknown, fallback: string, intent: 'profile' | 'email' | 'password') {
 	if (error instanceof APIError) {
@@ -21,16 +22,16 @@ export async function updateProfileAction(event: RequestEvent) {
 		return fail(401, { message: 'Unauthorized', intent: 'profile' as const });
 	}
 
-	const parsed = updateProfileSchema.safeParse({
+	const parsed = safeParse(updateProfileSchema, {
 		name: formString(await event.request.formData(), 'name')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'profile' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'profile' as const });
 	}
 
 	try {
 		await auth.api.updateUser({
-			body: { name: parsed.data.name },
+			body: { name: parsed.output.name },
 			headers: event.request.headers
 		});
 		return { saved: true, intent: 'profile' as const };
@@ -44,20 +45,20 @@ export async function changeEmailAction(event: RequestEvent) {
 		return fail(401, { message: 'Unauthorized', intent: 'email' as const });
 	}
 
-	const parsed = changeEmailSchema.safeParse({
+	const parsed = safeParse(changeEmailSchema, {
 		email: formString(await event.request.formData(), 'email')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'email' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'email' as const });
 	}
 
-	if (parsed.data.email.toLowerCase() === event.locals.user.email.toLowerCase()) {
+	if (parsed.output.email.toLowerCase() === event.locals.user.email.toLowerCase()) {
 		return fail(400, { message: 'Email is unchanged', intent: 'email' as const });
 	}
 
 	try {
 		await auth.api.changeEmail({
-			body: { newEmail: parsed.data.email },
+			body: { newEmail: parsed.output.email },
 			headers: event.request.headers
 		});
 		return { saved: true, intent: 'email' as const };
@@ -72,20 +73,20 @@ export async function changePasswordAction(event: RequestEvent) {
 	}
 
 	const data = await event.request.formData();
-	const parsed = changePasswordSchema.safeParse({
+	const parsed = safeParse(changePasswordSchema, {
 		currentPassword: formString(data, 'currentPassword'),
 		newPassword: formString(data, 'newPassword'),
 		confirmPassword: formString(data, 'confirmPassword')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'password' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'password' as const });
 	}
 
 	try {
 		await auth.api.changePassword({
 			body: {
-				currentPassword: parsed.data.currentPassword,
-				newPassword: parsed.data.newPassword
+				currentPassword: parsed.output.currentPassword,
+				newPassword: parsed.output.newPassword
 			},
 			headers: event.request.headers
 		});

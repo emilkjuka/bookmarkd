@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
 <svelte:head>
@@ -13,6 +13,7 @@
 <p class="mt-1 text-sm text-muted-foreground">Welcome back. Your bookmarks are waiting.</p>
 
 <form method="post" class="mt-6 space-y-4" use:enhance>
+	<input type="hidden" name="redirectTo" value={data.redirectTo} />
 	<label class="block text-sm font-medium">
 		Email
 		<input

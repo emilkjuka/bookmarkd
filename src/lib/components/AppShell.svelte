@@ -4,6 +4,7 @@
 	import AddBookmarkModal from './AddBookmarkModal.svelte';
 	import AddCategoryModal from './AddCategoryModal.svelte';
 	import AddTagModal from './AddTagModal.svelte';
+	import Icon from './Icon.svelte';
 	import SearchBar from './SearchBar.svelte';
 	import type { Category, Tag } from '#lib/types';
 
@@ -73,16 +74,7 @@
 		aria-label="Open sidebar"
 		onclick={() => (sidebarOpen = true)}
 	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="20"
-			height="20"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16" /></svg
-		>
+		<Icon name="lucide--menu" class="size-5" />
 	</button>
 
 	<aside
@@ -121,16 +113,7 @@
 						aria-label="Add category"
 						onclick={() => (categoryOpen = true)}
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg
-						>
+						<Icon name="lucide--plus" class="size-3.5" />
 					</button>
 				</div>
 				{#each categories as category (category.id)}
@@ -157,16 +140,7 @@
 						aria-label="Add tag"
 						onclick={() => (tagOpen = true)}
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="14"
-							height="14"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg
-						>
+						<Icon name="lucide--plus" class="size-3.5" />
 					</button>
 				</div>
 				{#each tags as tag (tag.id)}
@@ -203,16 +177,7 @@
 		aria-label="Add bookmark"
 		onclick={() => (addOpen = true)}
 	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg
-		>
+		<Icon name="lucide--plus" class="size-6" />
 	</button>
 
 	<AddBookmarkModal bind:visible={addOpen} {categories} {tags} onclose={closeAddModal} />

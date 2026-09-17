@@ -1,24 +1,32 @@
 # Self-hosting Bookmarkd
 
-Bookmarkd is designed to run as a single container with a persistent SQLite volume. This guide covers deployment on a **Proxmox LXC** container.
+Bookmarkd runs as a single Docker container with a persistent SQLite volume. This guide covers deployment on a **Proxmox LXC** container.
 
 ## Architecture
 
+### Private access via NetBird (recommended for personal use)
+
+Same pattern as Home Assistant: run on your LAN, reach it from your devices through NetBird.
+
 ```text
-Internet
+Your devices (NetBird client)
    │
    ▼
-Reverse proxy (Caddy / NPM / Traefik)  ← optional but recommended for HTTPS
+NetBird mesh VPN
    │
    ▼
-Docker: bookmarkd (:3000)
+LXC: Docker bookmarkd (:3000)
    │
    └── volume: /data/bookmarkd.db
 ```
 
-One container, one SQLite file, no external database required.
+No public domain, no reverse proxy, no HTTPS required.
 
-## Proxmox LXC strategy
+### Public internet (optional)
+
+If you want to expose Bookmarkd on the public internet, add a reverse proxy with HTTPS (see [HTTPS with Caddy](#https-with-caddy-optional) below).
+
+## Proxmox LXC setup
 
 ### 1. Create the LXC container
 
@@ -61,7 +69,6 @@ cp .env.example .env
 Edit `.env`:
 
 ```bash
-ORIGIN=https://bookmarks.example.com
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 BOOKMARKD_PORT=3000
 ```
@@ -72,7 +79,7 @@ Build and start:
 docker compose up -d --build
 ```
 
-Verify:
+Verify locally on the LXC:
 
 ```bash
 docker compose ps
@@ -80,32 +87,37 @@ docker compose logs -f bookmarkd
 curl -I http://127.0.0.1:3000/login
 ```
 
-### 4. HTTPS with Caddy (recommended)
+## NetBird access
 
-Install Caddy on the same LXC:
+Install the NetBird client on the LXC (or route to it from a peer that can reach the LXC on your LAN).
 
-```bash
-apt install -y debian-keyring debian-archive-keyring apt-transport-https
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-apt update && apt install -y caddy
+### Set `ORIGIN`
+
+`ORIGIN` must **exactly** match the URL you type in your browser. Auth cookies depend on this.
+
+Use your NetBird IP or hostname — and use it everywhere, including at home on the same network:
+
+```env
+# NetBird IP example
+ORIGIN=http://100.64.0.5:3000
+
+# Or NetBird hostname
+ORIGIN=http://bookmarkd.netbird.cloud:3000
 ```
 
-Copy and edit the example config:
-
-```bash
-cp Caddyfile.example /etc/caddy/Caddyfile
-# Replace bookmarks.example.com with your domain
-systemctl reload caddy
-```
-
-Ensure `ORIGIN` in `.env` matches your public HTTPS URL, then restart the app:
+After setting `ORIGIN`, restart:
 
 ```bash
 docker compose up -d
 ```
 
-### 5. Backups
+### Tips
+
+- **Stick to one URL.** Switching between a LAN IP and a NetBird IP will break auth because `ORIGIN` only matches one.
+- **HTTP is fine** on a private VPN. You don't need Caddy or TLS for NetBird-only access.
+- **Firewall:** restrict port 3000 to NetBird peers if you expose it beyond localhost. NetBird ACLs can also limit access.
+
+## Backups
 
 The entire database is a single file inside the Docker volume:
 
@@ -130,6 +142,37 @@ docker compose up -d --build
 
 Schema changes are applied automatically on container start via `drizzle-kit push`.
 
+## HTTPS with Caddy (optional)
+
+Only needed if you want **public internet** access with a domain name. Skip this section for NetBird-only use.
+
+Install Caddy on the LXC:
+
+```bash
+apt install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+apt update && apt install -y caddy
+```
+
+Copy and edit the example config:
+
+```bash
+cp Caddyfile.example /etc/caddy/Caddyfile
+# Replace bookmarks.example.com with your domain
+systemctl reload caddy
+```
+
+Set `ORIGIN` to your public HTTPS URL and restart:
+
+```env
+ORIGIN=https://bookmarks.example.com
+```
+
+```bash
+docker compose up -d
+```
+
 ## Alternative: Docker on the Proxmox host
 
 If you prefer not to run Docker inside LXC:
@@ -143,7 +186,7 @@ LXC + Docker is still a good fit when you want isolated, resource-limited worklo
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ORIGIN` | Yes | Public base URL, e.g. `https://bookmarks.example.com` |
+| `ORIGIN` | Yes | Base URL you use in the browser, e.g. `http://100.64.0.5:3000` (NetBird) or `https://bookmarks.example.com` (public) |
 | `BETTER_AUTH_SECRET` | Yes | 32+ character secret for auth tokens |
 | `DATABASE_URL` | Auto in Docker | Path to SQLite file (`/data/bookmarkd.db` in Compose) |
 | `HOST` | Auto | Bind address (`0.0.0.0` in Docker) |

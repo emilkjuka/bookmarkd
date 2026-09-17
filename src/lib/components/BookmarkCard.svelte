@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Icon from '#lib/components/Icon.svelte';
 	import { hostnameFromUrl } from '#lib/url';
 	import type { Bookmark } from '#lib/types';
 
@@ -70,20 +71,7 @@
 				class="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/90 backdrop-blur-sm"
 				aria-label="Pinned"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="12"
-					height="12"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					stroke="currentColor"
-					stroke-width="1.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					><path d="M12 17v5" /><path
-						d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3.76Z"
-					/></svg
-				>
+				<Icon name="lucide--pin" class="size-3" />
 			</div>
 		{/if}
 
@@ -109,19 +97,7 @@
 			class={heroActionClass}
 			aria-label="Open link"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path
-					d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-				/></svg
-			>
+			<Icon name="lucide--external-link" class="size-3.5" />
 		</a>
 
 		<div class="relative">
@@ -133,18 +109,7 @@
 				aria-haspopup="menu"
 				onclick={() => (menuOpen = !menuOpen)}
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="14"
-					height="14"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle
-						cx="19"
-						cy="12"
-						r="1.5"
-					/></svg
-				>
+				<Icon name="lucide--ellipsis" class="size-3.5" />
 			</button>
 			{#if menuOpen}
 				<button
@@ -193,7 +158,7 @@
 						use:enhance={() => {
 							return async ({ update }) => {
 								menuOpen = false;
-								await update();
+								await update({ invalidateAll: true });
 							};
 						}}
 						onsubmit={(event) => {
@@ -225,20 +190,7 @@
 			{bookmark.title}
 		</a>
 		<div class="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="12"
-				height="12"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				class="shrink-0"
-				><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path
-					d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
-				/></svg
-			>
+			<Icon name="lucide--link" class="size-3 shrink-0" />
 			<span class="truncate">{domain}</span>
 		</div>
 	</div>
@@ -247,20 +199,7 @@
 		class="flex items-center justify-between gap-3 border-t px-3 py-2 text-xs text-muted-foreground"
 	>
 		<div class="flex min-w-0 items-center gap-1.5">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="12"
-				height="12"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				class="shrink-0 text-primary"
-				><path
-					d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
-				/></svg
-			>
+			<Icon name="lucide--folder" class="size-3 shrink-0 text-primary" />
 			{#if bookmark.category}
 				<a href="/categories/{bookmark.category.slug}" class="truncate hover:text-primary">
 					{bookmark.category.name}
@@ -270,20 +209,7 @@
 			{/if}
 		</div>
 		<div class="flex shrink-0 items-center gap-1.5">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="12"
-				height="12"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				class="shrink-0"
-				><path
-					d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
-				/></svg
-			>
+			<Icon name="lucide--calendar" class="size-3 shrink-0" />
 			<time datetime={bookmark.createdAt.toISOString()}>{createdLabel}</time>
 		</div>
 	</div>

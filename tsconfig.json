@@ -6,7 +6,9 @@
 		"strict": true,
 		"paths": {
 			"#lib": ["./src/lib/index.ts"],
-			"#lib/*": ["./src/lib/*"]
+			"#lib/*": ["./src/lib/*"],
+			"$iconify": ["./node_modules/.iconify/generated.css"],
+			"$iconifyTypes": ["./node_modules/.iconify/generated.d.ts"]
 		}
 	},
 	"include": ["src", "drizzle.config.ts"]

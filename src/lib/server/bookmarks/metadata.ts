@@ -48,7 +48,10 @@ function resolveUrl(value: string, base: string): string | null {
 	}
 }
 
-export async function fetchPageMetadata(rawUrl: string): Promise<PageMetadata> {
+export async function fetchPageMetadata(
+	rawUrl: string,
+	fetchFn: typeof fetch = fetch
+): Promise<PageMetadata> {
 	const parsed = new URL(rawUrl);
 	if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
 		throw new Error('URL must start with http:// or https://');
@@ -69,7 +72,7 @@ export async function fetchPageMetadata(rawUrl: string): Promise<PageMetadata> {
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
 	try {
-		const response = await fetch(parsed.href, {
+		const response = await fetchFn(parsed.href, {
 			signal: controller.signal,
 			headers: {
 				'User-Agent': USER_AGENT,

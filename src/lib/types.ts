@@ -29,6 +29,11 @@ export type Bookmark = {
 	tags: Tag[];
 };
 
+export type FlashMessage = {
+	type: 'success' | 'error' | 'info';
+	message: string;
+};
+
 export type PageMetadata = {
 	url: string;
 	title: string;

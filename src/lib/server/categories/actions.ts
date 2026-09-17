@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
+import { safeParse } from 'valibot';
 import {
 	categoryDeleteSchema,
 	categorySchema,
@@ -10,7 +11,7 @@ import {
 } from '#lib/schemas/bookmark';
 import { createCategory, deleteCategory, updateCategory } from '#lib/server/categories/service';
 import { createTag, deleteTag, updateTag } from '#lib/server/tags/service';
-import { firstZodError, formString } from '#lib/server/form';
+import { firstValidationError, formString } from '#lib/server/form';
 
 function requireUserId(event: RequestEvent): string {
 	const userId = event.locals.user?.id;
@@ -21,17 +22,17 @@ function requireUserId(event: RequestEvent): string {
 export async function createCategoryAction(event: RequestEvent) {
 	const userId = requireUserId(event);
 	const data = await event.request.formData();
-	const parsed = categorySchema.safeParse({
+	const parsed = safeParse(categorySchema, {
 		name: formString(data, 'name'),
 		color: formString(data, 'color'),
 		urlPatterns: formString(data, 'urlPatterns')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'category' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'category' as const });
 	}
 
 	try {
-		await createCategory(userId, parsed.data);
+		await createCategory(userId, parsed.output);
 		return { saved: true, intent: 'category' as const };
 	} catch (error) {
 		return fail(400, {
@@ -44,18 +45,18 @@ export async function createCategoryAction(event: RequestEvent) {
 export async function updateCategoryAction(event: RequestEvent) {
 	const userId = requireUserId(event);
 	const data = await event.request.formData();
-	const parsed = categoryUpdateSchema.safeParse({
+	const parsed = safeParse(categoryUpdateSchema, {
 		id: formString(data, 'id'),
 		name: formString(data, 'name'),
 		color: formString(data, 'color'),
 		urlPatterns: formString(data, 'urlPatterns')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'category' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'category' as const });
 	}
 
 	try {
-		await updateCategory(userId, parsed.data.id, parsed.data);
+		await updateCategory(userId, parsed.output.id, parsed.output);
 		return { saved: true, intent: 'category' as const };
 	} catch (error) {
 		return fail(400, {
@@ -67,15 +68,15 @@ export async function updateCategoryAction(event: RequestEvent) {
 
 export async function deleteCategoryAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = categoryDeleteSchema.safeParse({
+	const parsed = safeParse(categoryDeleteSchema, {
 		id: formString(await event.request.formData(), 'id')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'category' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'category' as const });
 	}
 
 	try {
-		await deleteCategory(userId, parsed.data.id);
+		await deleteCategory(userId, parsed.output.id);
 		return { deleted: true, intent: 'category' as const };
 	} catch (error) {
 		return fail(400, {
@@ -87,15 +88,15 @@ export async function deleteCategoryAction(event: RequestEvent) {
 
 export async function createTagAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = tagSchema.safeParse({
+	const parsed = safeParse(tagSchema, {
 		name: formString(await event.request.formData(), 'name')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'tag' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'tag' as const });
 	}
 
 	try {
-		await createTag(userId, parsed.data.name);
+		await createTag(userId, parsed.output.name);
 		return { saved: true, intent: 'tag' as const };
 	} catch (error) {
 		return fail(400, {
@@ -108,16 +109,16 @@ export async function createTagAction(event: RequestEvent) {
 export async function updateTagAction(event: RequestEvent) {
 	const userId = requireUserId(event);
 	const data = await event.request.formData();
-	const parsed = tagUpdateSchema.safeParse({
+	const parsed = safeParse(tagUpdateSchema, {
 		id: formString(data, 'id'),
 		name: formString(data, 'name')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'tag' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'tag' as const });
 	}
 
 	try {
-		await updateTag(userId, parsed.data.id, parsed.data.name);
+		await updateTag(userId, parsed.output.id, parsed.output.name);
 		return { saved: true, intent: 'tag' as const };
 	} catch (error) {
 		return fail(400, {
@@ -129,15 +130,15 @@ export async function updateTagAction(event: RequestEvent) {
 
 export async function deleteTagAction(event: RequestEvent) {
 	const userId = requireUserId(event);
-	const parsed = tagDeleteSchema.safeParse({
+	const parsed = safeParse(tagDeleteSchema, {
 		id: formString(await event.request.formData(), 'id')
 	});
 	if (!parsed.success) {
-		return fail(400, { message: firstZodError(parsed.error), intent: 'tag' as const });
+		return fail(400, { message: firstValidationError(parsed.issues), intent: 'tag' as const });
 	}
 
 	try {
-		await deleteTag(userId, parsed.data.id);
+		await deleteTag(userId, parsed.output.id);
 		return { deleted: true, intent: 'tag' as const };
 	} catch (error) {
 		return fail(400, {

@@ -218,8 +218,12 @@ export async function getBookmark(userId: string, id: string): Promise<Bookmark 
 	return hydrated ?? null;
 }
 
-export async function createBookmark(userId: string, input: BookmarkWriteInput): Promise<Bookmark> {
-	const metadata = await fetchPageMetadata(input.url);
+export async function createBookmark(
+	userId: string,
+	input: BookmarkWriteInput,
+	fetchFn?: typeof fetch
+): Promise<Bookmark> {
+	const metadata = await fetchPageMetadata(input.url, fetchFn);
 	let categoryId: string | null;
 	if (input.newCategory?.trim()) {
 		categoryId = await resolveCategoryId(userId, null, input.newCategory);
