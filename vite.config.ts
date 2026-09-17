@@ -6,7 +6,7 @@ import { iconify } from './plugins/iconify.ts';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
-	// loadEnv reads .env files only; Docker build passes ORIGIN via process.env ( .env is dockerignored )
+	// loadEnv reads .env files only; Docker build passes ORIGIN via process.env (.env is dockerignored)
 	const origin = env.ORIGIN || process.env.ORIGIN;
 
 	return {
@@ -23,7 +23,6 @@ export default defineConfig(({ mode }) => {
 						filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
 					experimental: { async: true }
 				},
-				// Required for CSRF checks and auth in production (adapter-node 6 bakes this at build time)
 				paths: {
 					origin: origin || undefined
 				},

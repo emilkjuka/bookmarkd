@@ -23,7 +23,8 @@ export const actions: Actions = {
 
 		try {
 			await auth.api.signInEmail({
-				body: { email, password }
+				body: { email, password },
+				headers: request.headers
 			});
 		} catch (error) {
 			if (error instanceof APIError) {
