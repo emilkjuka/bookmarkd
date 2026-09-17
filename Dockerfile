@@ -12,9 +12,11 @@ RUN bun install --frozen-lockfile
 
 FROM deps AS builder
 COPY . .
+ARG ORIGIN=http://localhost:3000
+ARG BETTER_AUTH_SECRET=build-time-secret-minimum-32-characters
 ENV DATABASE_URL=/tmp/build.db \
-	ORIGIN=http://localhost:3000 \
-	BETTER_AUTH_SECRET=build-time-secret-minimum-32-characters
+	ORIGIN=${ORIGIN} \
+	BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 RUN bun run build
 
 FROM base AS runner

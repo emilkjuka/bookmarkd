@@ -199,6 +199,8 @@ LXC + Docker is still a good fit when you want isolated, resource-limited worklo
 
 **Permission errors on `/data`** — ensure the Docker volume is writable; avoid bind-mounting a root-owned path without correct permissions.
 
-**Container restart loop** — check logs: `docker compose logs bookmarkd`. Usually a missing `BETTER_AUTH_SECRET` or invalid `ORIGIN`.
+**Container restart loop** — check logs: `docker compose logs bookmarkd`. Usually a missing `BETTER_AUTH_SECRET`, invalid `ORIGIN`, or an outdated `@sveltejs/adapter-node` (must be `6.x` with SvelteKit 3).
+
+**`Cannot find module '@sveltejs/kit/node/polyfills'`** — upgrade `@sveltejs/adapter-node` to `6.0.0-next.12` or later, then rebuild: `docker compose up -d --build`.
 
 **Docker won't start inside LXC** — confirm `nesting=1` is enabled on the container.

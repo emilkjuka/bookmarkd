@@ -1,6 +1,10 @@
 services:
   bookmarkd:
-    build: .
+    build:
+      context: .
+      args:
+        ORIGIN: ${ORIGIN:-http://localhost:3000}
+        BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-build-time-secret-minimum-32-characters}
     restart: unless-stopped
     ports:
       - '${BOOKMARKD_PORT:-3000}:3000'
