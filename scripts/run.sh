@@ -42,7 +42,8 @@ ensure_env() {
 		cat <<'EOF'
 
 Reminder: set ORIGIN in .env to the URL you use in the browser
-  (e.g. http://100.64.0.5:3000). Auth cookies depend on it.
+  (e.g. http://100.64.0.5:3000) BEFORE building.
+  Auth and form submissions depend on it (baked in at build time).
 
 EOF
 	fi
