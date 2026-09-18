@@ -6,17 +6,24 @@ import { iconify } from './plugins/iconify.ts';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
-	// loadEnv reads .env files only; Docker build passes ORIGIN via process.env (.env is dockerignored)
-	const origin = env.ORIGIN || process.env.ORIGIN;
+	// Docker build sets ORIGIN via ENV / .env.production (.env is dockerignored)
+	const origin = (process.env.ORIGIN || env.ORIGIN)?.replace(/\/$/, '');
+	const disableCsrf = process.env.DISABLE_CSRF === 'true';
+
+	if (mode === 'production') {
+		if (origin) {
+			console.log(`[vite] paths.origin = ${origin}`);
+		} else if (!disableCsrf) {
+			console.warn(
+				'[vite] ORIGIN is not set — CSRF origin checks will fail unless DISABLE_CSRF=true'
+			);
+		}
+	}
 
 	return {
 		plugins: [
 			tailwindcss(),
 			sveltekit({
-				alias: {
-					$iconify: 'node_modules/.iconify/generated.css',
-					$iconifyTypes: 'node_modules/.iconify/generated.d.ts'
-				},
 				compilerOptions: {
 					// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 					runes: ({ filename }) =>
@@ -26,6 +33,8 @@ export default defineConfig(({ mode }) => {
 				paths: {
 					origin: origin || undefined
 				},
+				// Private self-host only: set DISABLE_CSRF=true in .env if POST requests still 403
+				csrf: disableCsrf ? { trustedOrigins: ['*'] } : undefined,
 				adapter: adapter({ out: 'build' }),
 				experimental: { remoteFunctions: true }
 			}),

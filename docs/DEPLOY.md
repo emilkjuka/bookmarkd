@@ -197,7 +197,13 @@ LXC + Docker is still a good fit when you want isolated, resource-limited worklo
 
 **Auth cookies not working** — `ORIGIN` must exactly match the URL in your browser (scheme + host + port if non-standard).
 
-**403 "Cross-site POST form submissions are forbidden"** — `ORIGIN` in `.env` doesn't match the URL in your browser, or the image was built before `ORIGIN` was set. Set `ORIGIN` in `.env`, then rebuild: `docker compose up -d --build`. With SvelteKit 3, this value is baked in at build time via `paths.origin`.
+**403 "Cross-site POST form submissions are forbidden"** — the URL in your browser doesn't match the **baked** CSRF origin. `.env` is not copied into the Docker build image; `ORIGIN` must be passed as a build arg. Set `ORIGIN` in `.env`, then rebuild without cache:
+
+```bash
+./scripts/run.sh --no-cache
+```
+
+Check container logs on startup — they print `Bookmarkd ORIGIN=...` and warn if runtime `.env` differs from the baked value. Restarting alone (`docker compose restart`) does **not** rebuild or reload env; use `docker compose up -d --force-recreate` after editing `.env`.
 
 **Permission errors on `/data`** — ensure the Docker volume is writable; avoid bind-mounting a root-owned path without correct permissions.
 

@@ -5,6 +5,7 @@ services:
       args:
         ORIGIN: ${ORIGIN:-http://localhost:3000}
         BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-build-time-secret-minimum-32-characters}
+        DISABLE_CSRF: ${DISABLE_CSRF:-false}
     restart: unless-stopped
     ports:
       - '${BOOKMARKD_PORT:-3000}:3000'
@@ -12,6 +13,9 @@ services:
       - path: .env
         required: false
     environment:
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
+      DISABLE_CSRF: ${DISABLE_CSRF:-false}
       DATABASE_URL: /data/bookmarkd.db
       HOST: 0.0.0.0
       PORT: 3000

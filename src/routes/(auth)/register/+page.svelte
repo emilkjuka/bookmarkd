@@ -1,8 +1,29 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
+	import { goto } from '$app/navigation';
+	import { signUp } from '#lib/auth-client';
 
-	let { form }: { form: ActionData } = $props();
+	let name = $state('');
+	let email = $state('');
+	let password = $state('');
+	let message = $state('');
+	let loading = $state(false);
+
+	const submit = async (e: SubmitEvent) => {
+		e.preventDefault();
+		if (password.length < 8) {
+			message = 'Password must be at least 8 characters';
+			return;
+		}
+		loading = true;
+		message = '';
+		const res = await signUp.email({ name, email, password });
+		loading = false;
+		if (res.error) {
+			message = res.error.message ?? 'Could not create account';
+		} else {
+			await goto('/bookmarks', { invalidateAll: true });
+		}
+	};
 </script>
 
 <svelte:head>
@@ -12,11 +33,11 @@
 <h1 class="text-xl font-semibold">Create account</h1>
 <p class="mt-1 text-sm text-muted-foreground">Save links, organize them, find them later.</p>
 
-<form method="post" class="mt-6 space-y-4" use:enhance>
+<form onsubmit={submit} class="mt-6 space-y-4">
 	<label class="block text-sm font-medium">
 		Name
 		<input
-			name="name"
+			bind:value={name}
 			required
 			autocomplete="name"
 			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
@@ -26,7 +47,7 @@
 		Email
 		<input
 			type="email"
-			name="email"
+			bind:value={email}
 			required
 			autocomplete="email"
 			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
@@ -36,21 +57,22 @@
 		Password
 		<input
 			type="password"
-			name="password"
+			bind:value={password}
 			required
 			minlength="8"
 			autocomplete="new-password"
 			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
 		/>
 	</label>
-	{#if form?.message}
-		<p class="text-sm text-destructive">{form.message}</p>
+	{#if message}
+		<p class="text-sm text-destructive">{message}</p>
 	{/if}
 	<button
 		type="submit"
-		class="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-foreground transition hover:bg-primary/90"
+		disabled={loading}
+		class="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
 	>
-		Create account
+		{loading ? 'Creating account…' : 'Create account'}
 	</button>
 </form>
 

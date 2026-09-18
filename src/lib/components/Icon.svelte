@@ -1,6 +1,6 @@
 <script lang="ts">
-	import '../../../node_modules/.iconify/generated.css';
-	import type { IconName } from '$iconifyTypes';
+	import '#iconify';
+	import type { IconName } from '#iconify-types';
 
 	let { name, class: className }: { name: IconName; class?: string } = $props();
 </script>

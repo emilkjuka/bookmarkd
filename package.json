@@ -53,7 +53,9 @@
 	},
 	"imports": {
 		"#lib": "./src/lib/index.js",
-		"#lib/*": "./src/lib/*"
+		"#lib/*": "./src/lib/*",
+		"#iconify": "./node_modules/.iconify/generated.css",
+		"#iconify-types": "./node_modules/.iconify/generated.d.ts"
 	},
 	"dependencies": {
 		"better-sqlite3": "^13.0.2",

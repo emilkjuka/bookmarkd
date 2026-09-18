@@ -14,10 +14,21 @@ FROM deps AS builder
 COPY . .
 ARG ORIGIN=http://localhost:3000
 ARG BETTER_AUTH_SECRET=build-time-secret-minimum-32-characters
+ARG DISABLE_CSRF=false
 ENV DATABASE_URL=/tmp/build.db \
 	ORIGIN=${ORIGIN} \
-	BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-RUN bun run build
+	BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET} \
+	DISABLE_CSRF=${DISABLE_CSRF}
+# .env is dockerignored — write production env so Vite + SvelteKit env both see ORIGIN at build time
+RUN printf 'ORIGIN=%s\nBETTER_AUTH_SECRET=%s\nDISABLE_CSRF=%s\n' \
+		"${ORIGIN}" "${BETTER_AUTH_SECRET}" "${DISABLE_CSRF}" > .env.production \
+	&& echo "Building with ORIGIN=${ORIGIN} DISABLE_CSRF=${DISABLE_CSRF}" \
+	&& bun run build \
+	&& baked="$(grep -rho 'const origin = \"[^\"]*\"' build/server/chunks/handler*.js | head -1 | cut -d\" -f2)" \
+	&& if [ "${DISABLE_CSRF}" != "true" ] && [ -n "${ORIGIN}" ] && [ "${baked}" != "${ORIGIN}" ]; then \
+		echo "ERROR: ORIGIN=${ORIGIN} was not baked into the build (got: ${baked:-<empty>})" >&2; \
+		exit 1; \
+	fi
 
 FROM base AS runner
 ENV NODE_ENV=production \

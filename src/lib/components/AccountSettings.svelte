@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
+	import { signOut } from '#lib/auth-client';
 
 	let {
 		user,
@@ -26,6 +28,11 @@
 	const submitClass =
 		'rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90';
 	const editButtonClass = 'text-sm text-muted-foreground hover:text-foreground';
+
+	const handleSignOut = async () => {
+		await signOut();
+		await goto('/login', { invalidateAll: true });
+	};
 </script>
 
 <section class="rounded-md border bg-card p-5 text-card-foreground shadow-sm">
@@ -207,14 +214,13 @@
 		</div>
 
 		<div class="flex justify-end pt-3">
-			<form method="post" action="?/signOut" use:enhance>
-				<button
-					type="submit"
-					class="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-				>
-					Sign out
-				</button>
-			</form>
+			<button
+				type="button"
+				onclick={handleSignOut}
+				class="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+			>
+				Sign out
+			</button>
 		</div>
 	</div>
 </section>
