@@ -20,7 +20,7 @@ if (!dev && !productionOrigin) {
 }
 
 export const auth = betterAuth({
-	// Dev: derive base URL from each request (localhost, LAN IP, etc.)
+	// Dev: derive base URL from each request
 	...(dev ? {} : { baseURL: productionOrigin }),
 	secret: BETTER_AUTH_SECRET,
 	trustedOrigins: dev ? ['http://*', 'https://*'] : [productionOrigin],

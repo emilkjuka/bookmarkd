@@ -46,9 +46,9 @@ normalize_origin() {
 		return
 	fi
 
-	# Host only — append the published port (e.g. http://192.168.1.5 → http://192.168.1.5:3000)
-	if [[ "$origin" =~ ^(https?://[^:/]+)$ ]]; then
-		printf '%s' "${BASH_REMATCH[1]}:${port}"
+	# Bare IP without port — append Docker host port (direct container access)
+	if [[ "$origin" =~ ^https?://([0-9]{1,3}(\.[0-9]{1,3}){3}|[0-9a-fA-F:]+)$ ]]; then
+		printf '%s' "${origin}:${port}"
 		return
 	fi
 
@@ -77,11 +77,11 @@ load_build_env() {
 
 	local raw_origin port
 	raw_origin="$(read_env_var ORIGIN)"
-	port="$(read_env_var BOOKMARKD_PORT)"
+	port="$(read_env_var HOST_PORT)"
 	port="${port:-3000}"
 
 	if [[ -z "$raw_origin" ]]; then
-		echo "Error: ORIGIN is not set in .env" >&2
+		echo "Error: ORIGIN is not set in .env (use your reverse proxy URL)" >&2
 		exit 1
 	fi
 
@@ -97,7 +97,6 @@ load_build_env() {
 
 	if [[ "$ORIGIN" != "$raw_origin" ]]; then
 		echo "Note: normalized ORIGIN from ${raw_origin} → ${ORIGIN}"
-		echo "      (include :${port} in .env to match the URL in your browser exactly)"
 		if grep -q '^ORIGIN=' .env; then
 			sed -i "s|^ORIGIN=.*|ORIGIN=${ORIGIN}|" .env
 		else
@@ -105,7 +104,7 @@ load_build_env() {
 		fi
 	fi
 
-	export ORIGIN BETTER_AUTH_SECRET DISABLE_CSRF BOOKMARKD_PORT="$port"
+	export ORIGIN BETTER_AUTH_SECRET DISABLE_CSRF HOST_PORT="$port"
 	echo "Building with ORIGIN=${ORIGIN}"
 	if [[ "$DISABLE_CSRF" == "true" ]]; then
 		echo "CSRF origin checks disabled (DISABLE_CSRF=true)"
@@ -121,8 +120,6 @@ verify_baked_origin() {
 			echo "Warning: baked origin does not match ORIGIN=${ORIGIN}" >&2
 			echo "         Run ./scripts/run.sh --no-cache and try again." >&2
 		fi
-	else
-		echo "Could not read baked origin from container (build may still be starting)"
 	fi
 }
 
@@ -134,7 +131,11 @@ run_docker() {
 
 	load_build_env
 
-	local -a build_args=(--build-arg "ORIGIN=${ORIGIN}" --build-arg "BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}" --build-arg "DISABLE_CSRF=${DISABLE_CSRF}")
+	local -a build_args=(
+		--build-arg "ORIGIN=${ORIGIN}"
+		--build-arg "BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}"
+		--build-arg "DISABLE_CSRF=${DISABLE_CSRF}"
+	)
 	if [[ "${NO_CACHE}" == "1" ]]; then
 		build_args=(--no-cache "${build_args[@]}")
 	fi

@@ -1,30 +1,30 @@
 # Self-hosting Bookmarkd
 
-Bookmarkd runs as a single Docker container with a persistent SQLite volume. This guide covers deployment on a **Proxmox LXC** container.
+Bookmarkd runs as a single Docker container with a persistent SQLite volume. This guide covers deployment on a **Proxmox LXC** container (or any Docker host).
 
 ## Architecture
 
-### Private access via NetBird (recommended for personal use)
+### Reverse proxy (recommended)
 
-Same pattern as Home Assistant: run on your LAN, reach it from your devices through NetBird.
+Point your reverse proxy at the Docker container and set `ORIGIN` to the URL you use in the browser.
 
 ```text
-Your devices (NetBird client)
+Browser
    │
    ▼
-NetBird mesh VPN
+Reverse proxy  ← ORIGIN (e.g. http://bookmarks.local)
    │
    ▼
-LXC: Docker bookmarkd (:3000)
+Docker: bookmarkd (:3000)
    │
    └── volume: /data/bookmarkd.db
 ```
 
-No public domain, no reverse proxy, no HTTPS required.
+`ORIGIN` must **exactly** match what you type in the address bar (scheme, host, and port if non-standard). Auth cookies and CSRF checks depend on it.
 
-### Public internet (optional)
+### Direct container access (optional)
 
-If you want to expose Bookmarkd on the public internet, add a reverse proxy with HTTPS (see [HTTPS with Caddy](#https-with-caddy-optional) below).
+You can skip a reverse proxy and open `http://<host-ip>:3000` directly. Set `ORIGIN` to that same URL.
 
 ## Proxmox LXC setup
 
@@ -68,18 +68,21 @@ cp .env.example .env
 
 Edit `.env`:
 
-```bash
-BETTER_AUTH_SECRET=$(openssl rand -base64 32)
-BOOKMARKD_PORT=3000
+```env
+ORIGIN=http://bookmarks.local
+BETTER_AUTH_SECRET=<output of: openssl rand -base64 32>
+HOST_PORT=3000
 ```
 
 Build and start:
 
 ```bash
-docker compose up -d --build
+./scripts/run.sh
 ```
 
-Verify locally on the LXC:
+Configure your reverse proxy to forward traffic to `http://127.0.0.1:3000` (or the LXC IP on port 3000).
+
+Verify the container:
 
 ```bash
 docker compose ps
@@ -87,35 +90,17 @@ docker compose logs -f bookmarkd
 curl -I http://127.0.0.1:3000/login
 ```
 
-## NetBird access
+Then open your `ORIGIN` URL in a browser and sign in.
 
-Install the NetBird client on the LXC (or route to it from a peer that can reach the LXC on your LAN).
+### Changing `ORIGIN`
 
-### Set `ORIGIN`
-
-`ORIGIN` must **exactly** match the URL you type in your browser. Auth cookies depend on this.
-
-Use your NetBird IP or hostname — and use it everywhere, including at home on the same network:
-
-```env
-# NetBird IP example
-ORIGIN=http://100.64.0.5:3000
-
-# Or NetBird hostname
-ORIGIN=http://bookmarkd.netbird.cloud:3000
-```
-
-After setting `ORIGIN`, restart:
+After editing `ORIGIN` in `.env`, rebuild without cache:
 
 ```bash
-docker compose up -d
+./scripts/run.sh --no-cache
 ```
 
-### Tips
-
-- **Stick to one URL.** Switching between a LAN IP and a NetBird IP will break auth because `ORIGIN` only matches one.
-- **HTTP is fine** on a private VPN. You don't need Caddy or TLS for NetBird-only access.
-- **Firewall:** restrict port 3000 to NetBird peers if you expose it beyond localhost. NetBird ACLs can also limit access.
+Restarting alone does not update the baked CSRF origin or reload env — use `./scripts/run.sh` or `docker compose up -d --force-recreate` after changing `.env`.
 
 ## Backups
 
@@ -137,14 +122,14 @@ Schedule this with cron on the LXC host.
 ```bash
 cd bukmarkd
 git pull
-docker compose up -d --build
+./scripts/run.sh
 ```
 
 Schema changes are applied automatically on container start via `drizzle-kit push`.
 
 ## HTTPS with Caddy (optional)
 
-Only needed if you want **public internet** access with a domain name. Skip this section for NetBird-only use.
+If you want TLS on a public domain, run Caddy (or any reverse proxy) in front of the container.
 
 Install Caddy on the LXC:
 
@@ -163,14 +148,14 @@ cp Caddyfile.example /etc/caddy/Caddyfile
 systemctl reload caddy
 ```
 
-Set `ORIGIN` to your public HTTPS URL and restart:
+Set `ORIGIN` to your HTTPS URL and rebuild:
 
 ```env
 ORIGIN=https://bookmarks.example.com
 ```
 
 ```bash
-docker compose up -d
+./scripts/run.sh --no-cache
 ```
 
 ## Alternative: Docker on the Proxmox host
@@ -186,29 +171,26 @@ LXC + Docker is still a good fit when you want isolated, resource-limited worklo
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ORIGIN` | Yes | Base URL you use in the browser, e.g. `http://100.64.0.5:3000` (NetBird) or `https://bookmarks.example.com` (public) |
+| `ORIGIN` | Yes | URL you use in the browser (reverse proxy address), e.g. `http://bookmarks.local` |
 | `BETTER_AUTH_SECRET` | Yes | 32+ character secret for auth tokens |
+| `DISABLE_CSRF` | No | Set to `true` only as a last resort if form POSTs return 403 |
 | `DATABASE_URL` | Auto in Docker | Path to SQLite file (`/data/bookmarkd.db` in Compose) |
 | `HOST` | Auto | Bind address (`0.0.0.0` in Docker) |
 | `PORT` | Auto | Listen port (`3000`) |
-| `BOOKMARKD_PORT` | No | Host port mapped by Compose (default `3000`) |
+| `HOST_PORT` | No | Host port mapped by Compose (default `3000`) |
 
 ## Troubleshooting
 
-**Auth cookies not working** — `ORIGIN` must exactly match the URL in your browser (scheme + host + port if non-standard).
+**"Invalid origin" on login** — `ORIGIN` must exactly match the URL in your browser. Rebuild after changing it: `./scripts/run.sh --no-cache`. Check logs for `Bookmarkd ORIGIN=...`.
 
-**403 "Cross-site POST form submissions are forbidden"** — the URL in your browser doesn't match the **baked** CSRF origin. `.env` is not copied into the Docker build image; `ORIGIN` must be passed as a build arg. Set `ORIGIN` in `.env`, then rebuild without cache:
+**403 "Cross-site POST form submissions are forbidden"** — `ORIGIN` in `.env` doesn't match the browser URL, or the image was built before `ORIGIN` was set. Rebuild with `./scripts/run.sh --no-cache`.
 
-```bash
-./scripts/run.sh --no-cache
-```
-
-Check container logs on startup — they print `Bookmarkd ORIGIN=...` and warn if runtime `.env` differs from the baked value. Restarting alone (`docker compose restart`) does **not** rebuild or reload env; use `docker compose up -d --force-recreate` after editing `.env`.
+**Auth cookies not working** — same as above: `ORIGIN` must match the browser URL exactly (scheme + host + port if non-standard).
 
 **Permission errors on `/data`** — ensure the Docker volume is writable; avoid bind-mounting a root-owned path without correct permissions.
 
-**Container restart loop** — check logs: `docker compose logs bookmarkd`. Usually a missing `BETTER_AUTH_SECRET`, invalid `ORIGIN`, or an outdated `@sveltejs/adapter-node` (must be `6.x` with SvelteKit 3).
+**Container restart loop** — check logs: `docker compose logs bookmarkd`. Usually a missing `BETTER_AUTH_SECRET`, missing `ORIGIN`, or an outdated `@sveltejs/adapter-node` (must be `6.x` with SvelteKit 3).
 
-**`Cannot find module '@sveltejs/kit/node/polyfills'`** — upgrade `@sveltejs/adapter-node` to `6.0.0-next.12` or later, then rebuild: `docker compose up -d --build`.
+**`Cannot find module '@sveltejs/kit/node/polyfills'`** — upgrade `@sveltejs/adapter-node` to `6.0.0-next.12` or later, then rebuild.
 
 **Docker won't start inside LXC** — confirm `nesting=1` is enabled on the container.

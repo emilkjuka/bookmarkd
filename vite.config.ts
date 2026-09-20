@@ -14,9 +14,7 @@ export default defineConfig(({ mode }) => {
 		if (origin) {
 			console.log(`[vite] paths.origin = ${origin}`);
 		} else if (!disableCsrf) {
-			console.warn(
-				'[vite] ORIGIN is not set — CSRF origin checks will fail unless DISABLE_CSRF=true'
-			);
+			console.warn('[vite] ORIGIN is not set — CSRF origin checks may fail in production');
 		}
 	}
 
@@ -33,7 +31,6 @@ export default defineConfig(({ mode }) => {
 				paths: {
 					origin: origin || undefined
 				},
-				// Private self-host only: set DISABLE_CSRF=true in .env if POST requests still 403
 				csrf: disableCsrf ? { trustedOrigins: ['*'] } : undefined,
 				adapter: adapter({ out: 'build' }),
 				experimental: { remoteFunctions: true }

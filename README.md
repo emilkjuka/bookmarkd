@@ -14,11 +14,11 @@ bun run dev
 
 ```sh
 cp .env.example .env
-# Set ORIGIN and BETTER_AUTH_SECRET in .env
-docker compose up -d --build
+# Set ORIGIN (reverse proxy URL) and BETTER_AUTH_SECRET in .env
+./scripts/run.sh
 ```
 
-See [docs/DEPLOY.md](./docs/DEPLOY.md) for Proxmox LXC setup, NetBird access, and backups.
+See [docs/DEPLOY.md](./docs/DEPLOY.md) for self-hosting on Proxmox LXC, Docker, and backups.
 
 ## Scripts
 
