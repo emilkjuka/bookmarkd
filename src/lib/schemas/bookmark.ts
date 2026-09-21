@@ -1,10 +1,12 @@
 import * as v from 'valibot';
 import type { InferOutput } from 'valibot';
+import { normalizeUrlInput } from '#lib/url';
 
 export const urlSchema = v.pipe(
 	v.string(),
 	v.trim(),
 	v.minLength(1, 'URL is required'),
+	v.transform(normalizeUrlInput),
 	v.url('Enter a valid URL'),
 	v.check((value) => {
 		try {

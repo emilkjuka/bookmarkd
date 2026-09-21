@@ -31,6 +31,17 @@ function googleFavicon(origin: string): string {
 	return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(origin)}&sz=64`;
 }
 
+function fallbackMetadata(parsed: URL): PageMetadata {
+	const origin = parsed.origin;
+	return {
+		url: parsed.href,
+		title: parsed.hostname.replace(/^www\./, ''),
+		description: null,
+		faviconUrl: isPrivateHost(parsed.hostname) ? `${origin}/favicon.ico` : googleFavicon(origin),
+		imageUrl: null
+	};
+}
+
 function attr(
 	el: {
 		querySelector: (selector: string) => { getAttribute: (name: string) => string | null } | null;
@@ -56,17 +67,12 @@ export async function fetchPageMetadata(
 	if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
 		throw new Error('URL must start with http:// or https://');
 	}
+	// Private hosts (LAN IPs, .local, etc.) — save without server-side fetch (SSRF-safe)
 	if (isPrivateHost(parsed.hostname)) {
-		throw new Error('That URL cannot be fetched');
+		return fallbackMetadata(parsed);
 	}
 
-	const fallback: PageMetadata = {
-		url: parsed.href,
-		title: parsed.hostname.replace(/^www\./, ''),
-		description: null,
-		faviconUrl: googleFavicon(parsed.origin),
-		imageUrl: null
-	};
+	const fallback = fallbackMetadata(parsed);
 
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
