@@ -99,13 +99,9 @@
 			required
 			placeholder="https://example.com"
 			bind:value={urlInput}
-			class="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field flex-1"
 		/>
-		<button
-			type="submit"
-			formaction={prefillAction}
-			class="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-		>
+		<button type="submit" formaction={prefillAction} class="btn btn-secondary w-full sm:w-auto">
 			Prefill form
 		</button>
 	</div>
@@ -115,7 +111,7 @@
 		<input
 			name="title"
 			value={title}
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		/>
 	</label>
 
@@ -125,7 +121,7 @@
 			<span class="text-muted-foreground">Existing</span>
 			<select
 				name="categoryId"
-				class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+				class="field mt-1"
 			>
 				<option value="">Uncategorized</option>
 				{#each categories as category (category.id)}
@@ -146,7 +142,7 @@
 				name="newCategory"
 				maxlength="50"
 				placeholder="e.g. Reading list"
-				class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+				class="field mt-1"
 			/>
 			<span class="mt-1 block text-xs text-muted-foreground"
 				>Creates a category if it does not exist. Takes priority over the selection above.</span
@@ -160,7 +156,7 @@
 			name="description"
 			rows="2"
 			value={description}
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		></textarea>
 	</label>
 
@@ -171,7 +167,7 @@
 			rows="2"
 			value={bookmark?.notes ?? ''}
 			placeholder="Why you saved this…"
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		></textarea>
 	</label>
 
@@ -181,7 +177,7 @@
 			<div class="flex flex-wrap gap-2">
 				{#each tags as tag (tag.id)}
 					<label
-						class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-input bg-background px-2.5 py-1 text-xs has-[:checked]:border-primary/60 has-[:checked]:bg-primary/15 has-[:checked]:text-primary"
+						class="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-md border border-input bg-background px-3 py-2 text-xs has-[:checked]:border-primary/60 has-[:checked]:bg-primary/15 has-[:checked]:text-primary"
 					>
 						<input
 							type="checkbox"
@@ -200,7 +196,7 @@
 			<input
 				name="newTags"
 				placeholder="research, later, inspirations"
-				class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+				class="field mt-1"
 			/>
 			<span class="mt-1 block text-xs text-muted-foreground"
 				>Comma-separated. New tags are created automatically.</span
@@ -212,11 +208,8 @@
 		<p class="text-sm text-destructive">{message}</p>
 	{/if}
 
-	<div class="flex flex-row-reverse flex-wrap items-center gap-2">
-		<button
-			type="submit"
-			class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-		>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">
 			{bookmark ? 'Save changes' : 'Save bookmark'}
 		</button>
 	</div>

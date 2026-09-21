@@ -36,28 +36,24 @@
 							name="name"
 							required
 							value={tag.name}
-							class="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+							class="field min-w-0 flex-1 !py-2"
 						/>
-						<div class="flex items-center gap-3">
-							<button type="submit" class="text-sm font-medium text-primary">Save</button>
-							<button
-								type="button"
-								class="text-sm text-muted-foreground hover:text-foreground"
-								onclick={() => (editingId = null)}>Cancel</button
+						<div class="form-actions !flex-row">
+							<button type="submit" class="btn btn-primary">Save</button>
+							<button type="button" class="btn btn-ghost" onclick={() => (editingId = null)}
+								>Cancel</button
 							>
 						</div>
 					</form>
 				{:else}
-					<div class="flex items-center gap-3">
+					<div class="list-row">
 						<span class="w-2.5 shrink-0 text-center text-sm text-muted-foreground">#</span>
 						<a href="/tags/{tag.slug}" class="min-w-0 flex-1 font-medium hover:text-primary"
 							>{tag.name}</a
 						>
-						<div class="flex shrink-0 items-center gap-3">
-							<button
-								type="button"
-								class="text-sm text-muted-foreground hover:text-foreground"
-								onclick={() => (editingId = tag.id)}>Rename</button
+						<div class="list-row-actions">
+							<button type="button" class="btn btn-ghost" onclick={() => (editingId = tag.id)}
+								>Rename</button
 							>
 							<form
 								method="post"
@@ -70,10 +66,7 @@
 								}}
 							>
 								<input type="hidden" name="id" value={tag.id} />
-								<button
-									type="submit"
-									class="text-sm text-muted-foreground hover:text-destructive">Delete</button
-								>
+								<button type="submit" class="btn btn-ghost btn-destructive">Delete</button>
 							</form>
 						</div>
 					</div>

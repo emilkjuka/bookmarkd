@@ -42,7 +42,7 @@
 	<input
 		type="search"
 		placeholder="Search title, URL, notes…"
-		class="w-full rounded-md border border-input bg-card py-2 pr-3 pl-9 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+		class="field min-h-11 bg-card py-2 pr-3 pl-9"
 		{value}
 		{oninput}
 		{onkeydown}

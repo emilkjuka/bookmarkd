@@ -38,7 +38,7 @@
 								name="name"
 								required
 								value={category.name}
-								class="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+								class="field min-w-0 flex-1 !py-2"
 							/>
 							<div class="flex items-center gap-1">
 								{#each CATEGORY_COLORS as color (color)}
@@ -65,21 +65,19 @@
 								name="urlPatterns"
 								rows="2"
 								placeholder="reddit.com"
-								class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+								class="field mt-1"
 								>{category.urlPatterns.join('\n')}</textarea
 							>
 						</label>
-						<div class="flex items-center gap-3">
-							<button type="submit" class="text-sm font-medium text-primary">Save</button>
-							<button
-								type="button"
-								class="text-sm text-muted-foreground hover:text-foreground"
-								onclick={() => (editingId = null)}>Cancel</button
+						<div class="form-actions !flex-row">
+							<button type="submit" class="btn btn-primary">Save</button>
+							<button type="button" class="btn btn-ghost" onclick={() => (editingId = null)}
+								>Cancel</button
 							>
 						</div>
 					</form>
 				{:else}
-					<div class="flex items-center gap-3">
+					<div class="list-row">
 						<span
 							class="h-2.5 w-2.5 shrink-0 rounded-full"
 							style:background-color={category.color ?? '#a1a1aa'}
@@ -94,10 +92,10 @@
 								</p>
 							{/if}
 						</div>
-						<div class="flex shrink-0 items-center gap-3">
+						<div class="list-row-actions">
 							<button
 								type="button"
-								class="text-sm text-muted-foreground hover:text-foreground"
+								class="btn btn-ghost"
 								onclick={() => (editingId = category.id)}>Edit</button
 							>
 							<form
@@ -111,10 +109,7 @@
 								}}
 							>
 								<input type="hidden" name="id" value={category.id} />
-								<button
-									type="submit"
-									class="text-sm text-muted-foreground hover:text-destructive">Delete</button
-								>
+								<button type="submit" class="btn btn-ghost btn-destructive">Delete</button>
 							</form>
 						</div>
 					</div>

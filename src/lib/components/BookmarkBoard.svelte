@@ -34,7 +34,9 @@
 </script>
 
 {#snippet bookmarkGrid(items: Bookmark[])}
-	<div class="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),20rem))]">
+	<div
+		class="grid gap-3 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(min(100%,14rem),1fr))] lg:[grid-template-columns:repeat(auto-fill,minmax(min(100%,18rem),20rem))]"
+	>
 		{#each items as bookmark (bookmark.id)}
 			<BookmarkCard {bookmark} onedit={openEdit} />
 		{/each}
@@ -42,9 +44,9 @@
 {/snippet}
 
 {#if pinnedBookmarks.length > 0}
-	<section class="mb-10">
-		<div class="mb-6">
-			<h2 class="text-2xl font-semibold tracking-tight">Pinned</h2>
+	<section class="mb-8 sm:mb-10">
+		<div class="mb-4 sm:mb-6">
+			<h2 class="page-heading">Pinned</h2>
 			<p class="text-sm text-muted-foreground">
 				{pinnedBookmarks.length}
 				{pinnedBookmarks.length === 1 ? 'bookmark' : 'bookmarks'}
@@ -58,8 +60,8 @@
 {/if}
 
 <section>
-	<div class="mb-6">
-		<h1 class="text-2xl font-semibold tracking-tight">{heading}</h1>
+	<div class="mb-4 sm:mb-6">
+		<h1 class="page-heading">{heading}</h1>
 		<p class="text-sm text-muted-foreground">
 			{bookmarks.length}
 			{bookmarks.length === 1 ? 'bookmark' : 'bookmarks'}

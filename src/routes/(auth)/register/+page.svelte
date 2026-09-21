@@ -40,7 +40,7 @@
 			bind:value={name}
 			required
 			autocomplete="name"
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		/>
 	</label>
 	<label class="block text-sm font-medium">
@@ -50,7 +50,7 @@
 			bind:value={email}
 			required
 			autocomplete="email"
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		/>
 	</label>
 	<label class="block text-sm font-medium">
@@ -61,7 +61,7 @@
 			required
 			minlength="8"
 			autocomplete="new-password"
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		/>
 	</label>
 	{#if message}
@@ -70,7 +70,7 @@
 	<button
 		type="submit"
 		disabled={loading}
-		class="w-full rounded-md bg-primary px-4 py-2.5 font-medium text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+		class="btn btn-primary w-full"
 	>
 		{loading ? 'Creating account…' : 'Create account'}
 	</button>

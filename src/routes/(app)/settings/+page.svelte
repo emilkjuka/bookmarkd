@@ -29,7 +29,7 @@
 
 <div class="mx-auto max-w-3xl space-y-8">
 	<header>
-		<h1 class="text-2xl font-semibold tracking-tight">Settings</h1>
+		<h1 class="page-heading">Settings</h1>
 		<p class="mt-1 text-sm text-muted-foreground">Manage your account, categories, and tags.</p>
 	</header>
 

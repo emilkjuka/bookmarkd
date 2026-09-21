@@ -23,11 +23,7 @@
 	let showEmailForm = $derived(editingEmail || !!emailMessage);
 	let showPasswordForm = $derived(editingPassword || !!passwordMessage);
 
-	const inputClass =
-		'mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50';
-	const submitClass =
-		'rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90';
-	const editButtonClass = 'text-sm text-muted-foreground hover:text-foreground';
+	const inputClass = 'field mt-1';
 
 	const handleSignOut = async () => {
 		await signOut();
@@ -63,22 +59,22 @@
 					{#if profileMessage}
 						<p class="text-sm text-destructive">{profileMessage}</p>
 					{/if}
-					<div class="flex items-center gap-3">
-						<button type="submit" class={submitClass}>Save</button>
+					<div class="form-actions !flex-row">
+						<button type="submit" class="btn btn-primary">Save</button>
 						{#if !profileMessage}
-							<button type="button" class={editButtonClass} onclick={() => (editingProfile = false)}
+							<button type="button" class="btn btn-ghost" onclick={() => (editingProfile = false)}
 								>Cancel</button
 							>
 						{/if}
 					</div>
 				</form>
 			{:else}
-				<div class="flex items-center gap-3">
+				<div class="list-row">
 					<div class="min-w-0 flex-1">
 						<p class="text-sm text-muted-foreground">Name</p>
 						<p class="font-medium">{user.name}</p>
 					</div>
-					<button type="button" class={editButtonClass} onclick={() => (editingProfile = true)}
+					<button type="button" class="btn btn-ghost list-row-actions" onclick={() => (editingProfile = true)}
 						>Edit</button
 					>
 				</div>
@@ -115,22 +111,22 @@
 					{#if emailMessage}
 						<p class="text-sm text-destructive">{emailMessage}</p>
 					{/if}
-					<div class="flex items-center gap-3">
-						<button type="submit" class={submitClass}>Save</button>
+					<div class="form-actions !flex-row">
+						<button type="submit" class="btn btn-primary">Save</button>
 						{#if !emailMessage}
-							<button type="button" class={editButtonClass} onclick={() => (editingEmail = false)}
+							<button type="button" class="btn btn-ghost" onclick={() => (editingEmail = false)}
 								>Cancel</button
 							>
 						{/if}
 					</div>
 				</form>
 			{:else}
-				<div class="flex items-center gap-3">
+				<div class="list-row">
 					<div class="min-w-0 flex-1">
 						<p class="text-sm text-muted-foreground">Email</p>
 						<p class="font-medium">{user.email}</p>
 					</div>
-					<button type="button" class={editButtonClass} onclick={() => (editingEmail = true)}
+					<button type="button" class="btn btn-ghost list-row-actions" onclick={() => (editingEmail = true)}
 						>Edit</button
 					>
 				</div>
@@ -189,36 +185,30 @@
 					{#if passwordMessage}
 						<p class="text-sm text-destructive">{passwordMessage}</p>
 					{/if}
-					<div class="flex items-center gap-3">
-						<button type="submit" class={submitClass}>Save</button>
+					<div class="form-actions !flex-row">
+						<button type="submit" class="btn btn-primary">Save</button>
 						{#if !passwordMessage}
-							<button
-								type="button"
-								class={editButtonClass}
-								onclick={() => (editingPassword = false)}>Cancel</button
+							<button type="button" class="btn btn-ghost" onclick={() => (editingPassword = false)}
+								>Cancel</button
 							>
 						{/if}
 					</div>
 				</form>
 			{:else}
-				<div class="flex items-center gap-3">
+				<div class="list-row">
 					<div class="min-w-0 flex-1">
 						<p class="text-sm text-muted-foreground">Password</p>
 						<p class="font-medium">••••••••</p>
 					</div>
-					<button type="button" class={editButtonClass} onclick={() => (editingPassword = true)}
+					<button type="button" class="btn btn-ghost list-row-actions" onclick={() => (editingPassword = true)}
 						>Change</button
 					>
 				</div>
 			{/if}
 		</div>
 
-		<div class="flex justify-end pt-3">
-			<button
-				type="button"
-				onclick={handleSignOut}
-				class="rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-			>
+		<div class="flex justify-stretch pt-3 sm:justify-end">
+			<button type="button" onclick={handleSignOut} class="btn btn-secondary w-full sm:w-auto">
 				Sign out
 			</button>
 		</div>

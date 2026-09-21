@@ -40,17 +40,12 @@
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="drawer-dialog-title"
-		class="relative z-10 flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-md border bg-card text-card-foreground shadow-xl sm:max-h-[90vh] sm:max-w-lg sm:rounded-md"
+		class="relative z-10 flex max-h-[85dvh] w-full flex-col overflow-hidden rounded-t-xl border bg-card pb-[env(safe-area-inset-bottom,0px)] text-card-foreground shadow-xl sm:max-h-[90vh] sm:max-w-lg sm:rounded-md sm:pb-0"
 	>
 		<div class="flex shrink-0 items-start justify-between gap-3 border-b px-5 py-4">
 			<h2 id="drawer-dialog-title" class="text-lg font-semibold">{title}</h2>
-			<button
-				type="button"
-				class="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-				aria-label="Close"
-				onclick={onclose}
-			>
-				<Icon name="lucide--x" class="size-[18px]" />
+			<button type="button" class="btn-icon-ghost -mr-1" aria-label="Close" onclick={onclose}>
+				<Icon name="lucide--x" class="size-5" />
 			</button>
 		</div>
 		<div class="overflow-y-auto px-5 py-4">

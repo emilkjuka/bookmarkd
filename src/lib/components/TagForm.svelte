@@ -37,7 +37,7 @@
 			required
 			maxlength="50"
 			placeholder="e.g. reading-list"
-			class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+			class="field mt-1"
 		/>
 	</label>
 
@@ -45,21 +45,10 @@
 		<p class="text-sm text-destructive">{message}</p>
 	{/if}
 
-	<div class="flex flex-row-reverse flex-wrap items-center gap-2">
-		<button
-			type="submit"
-			class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-		>
-			Create tag
-		</button>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">Create tag</button>
 		{#if oncancel}
-			<button
-				type="button"
-				class="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-				onclick={oncancel}
-			>
-				Cancel
-			</button>
+			<button type="button" class="btn btn-secondary" onclick={oncancel}>Cancel</button>
 		{/if}
 	</div>
 </form>

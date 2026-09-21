@@ -51,7 +51,7 @@
 
 	function navClass(active: boolean) {
 		return [
-			'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition',
+			'flex min-h-11 items-center gap-2 rounded-md px-3 py-2.5 text-sm transition',
 			active
 				? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
 				: 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -70,7 +70,7 @@
 
 	<button
 		type="button"
-		class="fixed top-4 left-4 z-30 rounded-md border bg-card p-2 text-muted-foreground shadow-sm hover:bg-accent hover:text-accent-foreground md:hidden"
+		class="btn-icon safe-top fixed left-4 z-30 md:hidden"
 		aria-label="Open sidebar"
 		onclick={() => (sidebarOpen = true)}
 	>
@@ -79,13 +79,13 @@
 
 	<aside
 		class={[
-			'fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform md:translate-x-0',
+			'fixed inset-y-0 left-0 z-40 flex w-[min(100vw-3rem,16rem)] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform sm:w-64 md:translate-x-0',
 			sidebarOpen ? 'translate-x-0' : '-translate-x-full'
 		]}
 	>
 		<div class="flex items-center gap-2 px-4 py-5">
 			<span
-				class="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground"
+				class="flex size-9 items-center justify-center rounded-md bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground"
 				>B</span
 			>
 			<span class="text-lg font-semibold tracking-tight">Bookmarkd</span>
@@ -109,11 +109,11 @@
 					</p>
 					<button
 						type="button"
-						class="rounded-md p-0.5 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+						class="btn-icon-ghost text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 						aria-label="Add category"
 						onclick={() => (categoryOpen = true)}
 					>
-						<Icon name="lucide--plus" class="size-3.5" />
+						<Icon name="lucide--plus" class="size-4" />
 					</button>
 				</div>
 				{#each categories as category (category.id)}
@@ -136,11 +136,11 @@
 					<p class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Tags</p>
 					<button
 						type="button"
-						class="rounded-md p-0.5 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+						class="btn-icon-ghost text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 						aria-label="Add tag"
 						onclick={() => (tagOpen = true)}
 					>
-						<Icon name="lucide--plus" class="size-3.5" />
+						<Icon name="lucide--plus" class="size-4" />
 					</button>
 				</div>
 				{#each tags as tag (tag.id)}
@@ -166,14 +166,14 @@
 	</aside>
 
 	<div class="min-h-screen md:pl-64">
-		<main class="w-full px-4 py-6 pt-16 md:px-6 md:pt-6">
+		<main class="main-offset-top main-offset-bottom w-full px-3 sm:px-4 md:px-6 md:pt-6 md:pb-6">
 			{@render children()}
 		</main>
 	</div>
 
 	<button
 		type="button"
-		class="fixed right-6 bottom-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 hover:shadow-xl"
+		class="safe-bottom fixed right-4 z-30 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition hover:bg-primary/90 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none md:right-6"
 		aria-label="Add bookmark"
 		onclick={() => (addOpen = true)}
 	>

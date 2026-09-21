@@ -31,11 +31,11 @@
 	);
 
 	const heroActionClass =
-		'flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/90 backdrop-blur-sm hover:bg-black/70';
+		'flex size-10 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white/90 backdrop-blur-sm hover:bg-black/70 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none';
 </script>
 
 <article
-	class="group flex w-full flex-col rounded-none border bg-card text-card-foreground transition hover:border-ring"
+	class="group flex w-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground transition hover:border-ring"
 >
 	<div class="relative">
 	<div class="relative aspect-[5/3] overflow-hidden bg-muted" style={heroStyle}>
@@ -125,7 +125,7 @@
 					<button
 						type="button"
 						role="menuitem"
-						class="block w-full px-3 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground"
+						class="btn-menu"
 						onclick={() => {
 							menuOpen = false;
 							onedit(bookmark.id);
@@ -144,11 +144,7 @@
 						}}
 					>
 						<input type="hidden" name="id" value={bookmark.id} />
-						<button
-							type="submit"
-							role="menuitem"
-							class="block w-full px-3 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground"
-						>
+						<button type="submit" role="menuitem" class="btn-menu">
 							{bookmark.pinned ? 'Unpin' : 'Pin'}
 						</button>
 					</form>
@@ -166,11 +162,7 @@
 						}}
 					>
 						<input type="hidden" name="id" value={bookmark.id} />
-						<button
-							type="submit"
-							role="menuitem"
-							class="block w-full px-3 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10"
-						>
+						<button type="submit" role="menuitem" class="btn-menu btn-destructive">
 							Delete
 						</button>
 					</form>
@@ -196,7 +188,7 @@
 	</div>
 
 	<div
-		class="flex items-center justify-between gap-3 border-t px-3 py-2 text-xs text-muted-foreground"
+		class="flex flex-col gap-2 border-t px-3 py-2.5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-3"
 	>
 		<div class="flex min-w-0 items-center gap-1.5">
 			<Icon name="lucide--folder" class="size-3 shrink-0 text-primary" />

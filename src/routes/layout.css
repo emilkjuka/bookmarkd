@@ -138,3 +138,79 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+@layer components {
+	.btn {
+		@apply inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
+	}
+
+	.btn-primary {
+		@apply bg-primary text-primary-foreground hover:bg-primary/90;
+	}
+
+	.btn-secondary {
+		@apply border border-border bg-background hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.btn-ghost {
+		@apply min-h-10 px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.btn-destructive {
+		@apply text-destructive hover:bg-destructive/10;
+	}
+
+	.btn-icon {
+		@apply inline-flex size-11 shrink-0 items-center justify-center rounded-md border border-border bg-card p-0 text-muted-foreground shadow-sm hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.btn-icon-ghost {
+		@apply inline-flex size-10 shrink-0 items-center justify-center rounded-md p-0 text-muted-foreground hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.btn-menu {
+		@apply flex min-h-11 w-full items-center px-3 py-2.5 text-left text-sm hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.field {
+		@apply w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50;
+	}
+
+	.page-heading {
+		@apply text-xl font-semibold tracking-tight sm:text-2xl;
+	}
+
+	.form-actions {
+		@apply flex flex-col-reverse gap-2 sm:flex-row sm:flex-row-reverse sm:items-center sm:justify-start;
+	}
+
+	.form-actions .btn {
+		@apply w-full sm:w-auto;
+	}
+
+	.list-row {
+		@apply flex flex-col gap-3 sm:flex-row sm:items-center;
+	}
+
+	.list-row-actions {
+		@apply flex flex-wrap items-center gap-2 sm:ml-auto sm:shrink-0;
+	}
+}
+
+@layer utilities {
+	.safe-top {
+		top: max(1rem, env(safe-area-inset-top, 0px));
+	}
+
+	.safe-bottom {
+		bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+	}
+
+	.main-offset-top {
+		padding-top: max(4.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+	}
+
+	.main-offset-bottom {
+		padding-bottom: max(6rem, calc(env(safe-area-inset-bottom, 0px) + 5rem));
+	}
+}
