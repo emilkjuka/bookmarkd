@@ -206,8 +206,8 @@
 		bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
 	}
 
-	.main-offset-top {
-		padding-top: max(4.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+	.mobile-header {
+		padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
 	}
 
 	.main-offset-bottom {

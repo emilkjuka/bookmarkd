@@ -68,26 +68,18 @@
 		></button>
 	{/if}
 
-	<button
-		type="button"
-		class="btn-icon safe-top fixed left-4 z-30 md:hidden"
-		aria-label="Open sidebar"
-		onclick={() => (sidebarOpen = true)}
-	>
-		<Icon name="lucide--menu" class="size-5" />
-	</button>
-
 	<aside
 		class={[
-			'fixed inset-y-0 left-0 z-40 flex w-[min(100vw-3rem,16rem)] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform sm:w-64 md:translate-x-0',
+			'fixed inset-y-0 left-0 z-40 flex w-[min(100vw,16rem)] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform sm:w-64 md:translate-x-0',
 			sidebarOpen ? 'translate-x-0' : '-translate-x-full'
 		]}
 	>
 		<div class="flex items-center gap-2 px-4 py-5">
 			<span
-				class="flex size-9 items-center justify-center rounded-md bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground"
-				>B</span
+				class="flex size-9 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
 			>
+				<Icon name="lucide--book-bookmark" class="size-5" />
+			</span>
 			<span class="text-lg font-semibold tracking-tight">Bookmarkd</span>
 		</div>
 
@@ -166,7 +158,29 @@
 	</aside>
 
 	<div class="min-h-screen md:pl-64">
-		<main class="main-offset-top main-offset-bottom w-full px-3 sm:px-4 md:px-6 md:pt-6 md:pb-6">
+		<header
+			class="mobile-header sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-background/95 px-3 py-3 backdrop-blur-sm md:hidden"
+		>
+			<button
+				type="button"
+				class="btn-icon shrink-0"
+				aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+				aria-expanded={sidebarOpen}
+				onclick={() => (sidebarOpen = !sidebarOpen)}
+			>
+				<Icon name={sidebarOpen ? 'lucide--x' : 'lucide--menu'} class="size-5" />
+			</button>
+			<a href="/bookmarks" class="flex min-w-0 items-center gap-2">
+				<span
+					class="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground"
+				>
+					<Icon name="lucide--book-bookmark" class="size-4.5" />
+				</span>
+				<span class="truncate text-base font-semibold tracking-tight">Bookmarkd</span>
+			</a>
+		</header>
+
+		<main class="main-offset-bottom w-full px-3 pt-4 sm:px-4 md:px-6 md:pt-6">
 			{@render children()}
 		</main>
 	</div>
